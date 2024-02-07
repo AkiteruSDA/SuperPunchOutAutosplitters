@@ -1,0 +1,23 @@
+{
+  "name": "superpunchoutautosplitters",
+  "version": "1.0.0",
+  "description": "Autosplitters for Super Punch-Out!! (SNES)",
+  "main": "src/index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node src/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AkiteruSDA/SuperPunchOutAutosplitters.git"
+  },
+  "author": "Akiteru",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/AkiteruSDA/SuperPunchOutAutosplitters/issues"
+  },
+  "homepage": "https://github.com/AkiteruSDA/SuperPunchOutAutosplitters#readme",
+  "dependencies": {
+    "ws": "^8.16.0"
+  }
+}
