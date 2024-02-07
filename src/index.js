@@ -1,5 +1,6 @@
 import { parseArgs } from "node:util";
 import { USB2SNES } from "./usb2snes.js";
+import { SuperPunchOut } from "./spo.js";
 import { sleep } from "./utils.js";
 
 global.args = parseArgs({
@@ -39,6 +40,12 @@ async function run() {
   console.log("Getting info...");
   let info = await usb2snes.send(USB2SNES.Opcodes.INFO);
   console.log(`Info: ${info}`);
+
+  let spo = new SuperPunchOut(usb2snes);
+  while (true) {
+    let time = await spo.getGameTime();
+    console.log(`Game time: ${time}`);
+  }
 }
 
 let closing = false;

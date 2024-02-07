@@ -92,7 +92,8 @@ export class USB2SNES {
 
   onMessage_(message) {
     let command = this.commands_.shift();
-    command.resolve(JSON.parse(message.data)[USB2SNES.Keys.RESULTS]);
+    let toResolve = Buffer.isBuffer(message.data) ? message.data : JSON.parse(message.data)[USB2SNES.Keys.RESULTS];
+    command.resolve(toResolve);
     if (this.commands_.length) {
       this.send_(this.commands_[0]);
     } else {
