@@ -14,7 +14,7 @@ export class USB2SNES {
 
   /**
    * Initialize the WebSocket client
-   * @returns {Promise}
+   * @returns {Promise<undefined>}
    */
   init() {
     return new Promise((resolve, reject) => {
@@ -58,7 +58,7 @@ export class USB2SNES {
    * @param {Array=} opt_operands
    * @param {Array=} opt_flags
    * @param {string=} opt_space
-   * @returns {Promise}
+   * @returns {Promise<object|buffer>}
    */
   send(opcode, opt_operands = [], opt_flags = [], opt_space = USB2SNES.Spaces.SNES) {
     let resolve = null;

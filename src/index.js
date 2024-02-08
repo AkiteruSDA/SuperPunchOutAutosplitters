@@ -43,8 +43,8 @@ async function run() {
 
   let spo = new SuperPunchOut(usb2snes);
   while (true) {
-    let time = await spo.getGameTime();
-    console.log(`Game time: ${time}`);
+    let [time, koShowing] = await Promise.all([spo.getGameTime(), spo.isKOShowing()]);
+    console.log(`Game time: ${time} | KO? ${koShowing}`);
   }
 }
 
