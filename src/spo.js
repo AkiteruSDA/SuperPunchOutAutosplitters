@@ -13,12 +13,16 @@ export class SuperPunchOut {
   }
 
   /**
-   * Gets the current in-game time as a string (m:ss.cc)
-   * @returns {Promise<string>}
+   * Gets the current in-game time in centiseconds
+   * @returns {Promise<number>}
    */
   async getGameTime() {
     let buffer = await this.client_.send(USB2SNES.Opcodes.GET_ADDRESS, [SuperPunchOut.Addresses.CENTISECONDS, "5"]);
-    return `${buffer[4]}:${buffer[3]}${buffer[2]}.${buffer[1]}${buffer[0]}`;
+    return buffer[0]
+      + buffer[1] * 10
+      + buffer[2] * 100
+      + buffer[3] * 1000
+      + buffer[4] * 6000;
   }
 
   /**
@@ -28,6 +32,24 @@ export class SuperPunchOut {
   async isKOShowing() {
     let buffer = await this.client_.send(USB2SNES.Opcodes.GET_ADDRESS, [SuperPunchOut.Addresses.COUNTER_GRAPHIC, "1"]);
     return buffer[0] === SuperPunchOut.CounterGraphics.TKO || buffer[0] === SuperPunchOut.CounterGraphics.KO;
+  }
+
+  /**
+   * Gets whether you are currently in a fight
+   * @returns {Promise<boolean>}
+   */
+  async isInFight() {
+    let buffer = await this.client_.send(USB2SNES.Opcodes.GET_ADDRESS, [SuperPunchOut.Addresses.IN_FIGHT, "1"]);
+    return buffer[0] === 1;
+  }
+
+  /**
+   * Gets whether you are currently in the Gabby Jay fight
+   * @returns {Promise<boolean>}
+   */
+  async isInGabbyJay() {
+    let buffer = await this.client_.send(USB2SNES.Opcodes.GET_ADDRESS, [SuperPunchOut.Addresses.CURRENT_FIGHT, "2"]);
+    return buffer[0] === 9 && buffer[1] === 0;
   }
 }
 
@@ -39,6 +61,8 @@ export class SuperPunchOut {
  */
 SuperPunchOut.Addresses = {
   COUNTER_GRAPHIC: "F50BD0", // Don't really know what to call this
+  IN_FIGHT: "F50001",
+  CURRENT_FIGHT: "F50990",
 
   // These represent each digit, not the total time in that unit
   CENTISECONDS: "F50B26", // 0-9

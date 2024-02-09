@@ -1,18 +1,29 @@
 import { parseArgs } from "node:util";
+import LiveSplitClient from "livesplit-client";
 import { USB2SNES } from "./usb2snes.js";
 import { SuperPunchOut } from "./spo.js";
-import { sleep } from "./utils.js";
+import { sleep, csToStr } from "./utils.js";
 
-global.args = parseArgs({
+const ArgKeys = {
+  USB2SNES_ADDRESS: "usb2snes-addr",
+  LIVESPLIT_ADDRESS: "livesplit-addr"
+};
+
+const args = parseArgs({
   options: {
-    "ws-addr": {
+    [ArgKeys.USB2SNES_ADDRESS]: {
       type: "string",
-      short: "w"
+      short: "u"
+    },
+    [ArgKeys.LIVESPLIT_ADDRESS]: {
+      type: "string",
+      short: "l"
     }
   }
 }).values;
 
-const usb2snes = new USB2SNES(global.args["ws-addr"]);
+const usb2snes = new USB2SNES(args[ArgKeys.USB2SNES_ADDRESS] || "ws://localhost:23074");
+const livesplit = new LiveSplitClient(args[ArgKeys.LIVESPLIT_ADDRESS] || "localhost:16834");
 
 async function run() {
   // Initialize USB2SNES client
@@ -41,10 +52,45 @@ async function run() {
   let info = await usb2snes.send(USB2SNES.Opcodes.INFO);
   console.log(`Info: ${info}`);
 
+  console.log("Connecting to LiveSplit.Server...");
+  try {
+    await livesplit.connect();
+  } catch (ex) {
+    close(`Failed to connect to LiveSplit.Server: ${ex}`);
+  }
+  livesplit.initGameTime();
+  livesplit.pauseGameTime();
+
   let spo = new SuperPunchOut(usb2snes);
+
+  let prevTime = 0;
+  let prevKO = false;
+  let prevGabby = false;
+  let total = 0;
+
   while (true) {
-    let [time, koShowing] = await Promise.all([spo.getGameTime(), spo.isKOShowing()]);
-    console.log(`Game time: ${time} | KO? ${koShowing}`);
+    let [time, isKO, isInFight, isInGabbyJay] = await Promise.all([
+      spo.getGameTime(),
+      spo.isKOShowing(),
+      spo.isInFight(),
+      spo.isInGabbyJay()
+    ]);
+    if (!prevGabby && isInGabbyJay) {
+      total = 0;
+      livesplit.reset();
+      livesplit.startTimer();
+      livesplit.pauseGameTime();
+    }
+    if (!prevKO && isKO) {
+      livesplit.split();
+    }
+    if (isInFight) {
+      total += time - prevTime;
+    }
+    prevTime = time;
+    prevGabby = isInGabbyJay;
+    prevKO = isKO;
+    livesplit.setGameTime(csToStr(total));
   }
 }
 
@@ -54,6 +100,7 @@ function close(message) {
     closing = true;
     console.log(`Closing${message ? `: ${message}` : "..."}`);
     usb2snes.close();
+    livesplit.disconnect();
     process.exit();
   }
 }

@@ -4,7 +4,7 @@ import WebSocket from "ws";
  * Client for the USB2SNES WebSocket server
  */
 export class USB2SNES {
-  constructor (addr = "ws://localhost:23074") {
+  constructor (addr) {
     this.addr_ = addr;
     this.ws_ = null;
     this.commands_ = [];
