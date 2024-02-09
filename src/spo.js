@@ -44,6 +44,15 @@ export class SuperPunchOut {
   }
 
   /**
+   * Gets whether you are currently in the credits
+   * @returns {Promise<boolean>}
+   */
+  async isInCredits() {
+    let buffer = await this.client_.send(USB2SNES.Opcodes.GET_ADDRESS, [SuperPunchOut.Addresses.IN_FIGHT, "1"]);
+    return buffer[0] === 0x82;
+  }
+
+  /**
    * Gets whether you are currently in the Gabby Jay fight
    * @returns {Promise<boolean>}
    */

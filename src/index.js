@@ -69,13 +69,14 @@ async function run() {
   let total = 0;
 
   while (true) {
-    let [time, isKO, isInFight, isInGabbyJay] = await Promise.all([
+    let [time, isKO, isInFight, isInCredits, isInGabbyJay] = await Promise.all([
       spo.getGameTime(),
       spo.isKOShowing(),
       spo.isInFight(),
+      spo.isInCredits(),
       spo.isInGabbyJay()
     ]);
-    if (!prevGabby && isInGabbyJay) {
+    if (!prevGabby && isInGabbyJay && !isInCredits) {
       total = 0;
       livesplit.reset();
       livesplit.startTimer();
