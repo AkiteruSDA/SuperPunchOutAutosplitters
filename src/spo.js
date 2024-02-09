@@ -1,4 +1,4 @@
-import { USB2SNES } from "./usb2snes.js";
+import { USB2SNES } from "usb2snes-client";
 
 /**
  * Interface with Super Punch-Out!! that uses the USB2SNES client

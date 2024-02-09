@@ -1,6 +1,6 @@
 import { parseArgs } from "node:util";
 import LiveSplitClient from "livesplit-client";
-import { USB2SNES } from "./usb2snes.js";
+import { USB2SNES } from "usb2snes-client";
 import { SuperPunchOut } from "./spo.js";
 import { sleep, csToStr } from "./utils.js";
 
